@@ -25,9 +25,7 @@ import android.media.MediaFormat;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
-import androidx.annotation.CheckResult;
-import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
+
 import com.google.android.exoplayer2.BaseRenderer;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -47,6 +45,7 @@ import com.google.android.exoplayer2.util.NalUnitUtil;
 import com.google.android.exoplayer2.util.TimedValueQueue;
 import com.google.android.exoplayer2.util.TraceUtil;
 import com.google.android.exoplayer2.util.Util;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -54,6 +53,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.CheckResult;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
 
 /**
  * An abstract renderer that uses {@link MediaCodec} to decode samples for rendering.
@@ -1679,13 +1682,15 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
   private boolean isDecodeOnlyBuffer(long presentationTimeUs) {
     // We avoid using decodeOnlyPresentationTimestamps.remove(presentationTimeUs) because it would
     // box presentationTimeUs, creating a Long object that would need to be garbage collected.
-    int size = decodeOnlyPresentationTimestamps.size();
+    /***注意：注释此段是为了，让exo不在进行跳帧处理,为了能快速的seek****/
+   /* int size = decodeOnlyPresentationTimestamps.size();
     for (int i = 0; i < size; i++) {
       if (decodeOnlyPresentationTimestamps.get(i) == presentationTimeUs) {
         decodeOnlyPresentationTimestamps.remove(i);
         return true;
       }
-    }
+    }*/
+    /***注意：注释此段是为了，让exo不在进行跳帧处理,为了能快速的seek****/
     return false;
   }
 

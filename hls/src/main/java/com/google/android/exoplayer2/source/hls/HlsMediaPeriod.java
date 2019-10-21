@@ -16,8 +16,8 @@
 package com.google.android.exoplayer2.source.hls;
 
 import android.net.Uri;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.SeekParameters;
@@ -44,6 +44,7 @@ import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +54,8 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.Nullable;
 
 /**
  * A {@link MediaPeriod} that loads an HLS stream.
@@ -371,7 +374,14 @@ public final class HlsMediaPeriod implements MediaPeriod, HlsSampleStreamWrapper
     if (enabledSampleStreamWrappers.length > 0) {
       // We need to reset all wrappers if the one responsible for initializing timestamp adjusters
       // is reset. Else each wrapper can decide whether to reset independently.
-      boolean forceReset = enabledSampleStreamWrappers[0].seekToUs(positionUs, false);
+      /**
+       * enabledSampleStreamWrappers[0].seekToUs(positionUs, false) 修改为
+       * enabledSampleStreamWrappers[0].seekToUs(positionUs, true) 目的：让每次seek之后，缓冲区都进行重置
+       *
+       *** Fix问题：以前的seek为exact seeking，当前的seek去掉了跳帧操作，但是在缓冲区之间seek,会出现帧残留的情况，所以每次seek,
+       * 把缓冲区清空。
+       **/
+      boolean forceReset = enabledSampleStreamWrappers[0].seekToUs(positionUs, true);
       for (int i = 1; i < enabledSampleStreamWrappers.length; i++) {
         enabledSampleStreamWrappers[i].seekToUs(positionUs, forceReset);
       }
