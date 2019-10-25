@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rl_main"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/rl_main"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".MainActivity">
 
     <Button
         android:id="@+id/btn_screen_switch"
@@ -12,51 +13,103 @@
         android:layout_height="wrap_content"
         android:text="测试播放器，小屏-大屏切换"/>
 
-    <Button
-        android:layout_below="@id/btn_screen_switch"
-        android:id="@+id/btn_subtitle_switch"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_cl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="测试字幕切换"/>
+        android:layout_below="@+id/btn_screen_switch">
 
-    <Button
-        android:layout_below="@id/btn_subtitle_switch"
-        android:id="@+id/btn_speed_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="测试切换倍速"/>
+        <Button
+            android:id="@+id/btn_subtitle_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试字幕切换"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_speed_switch"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_speed_switch"
+            app:layout_constraintTop_toTopOf="@+id/btn_speed_switch"/>
 
-    <Button
-        android:layout_below="@id/btn_speed_switch"
-        android:id="@+id/btn_pause"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="暂停/播放" />
+        <Button
+            android:id="@+id/btn_speed_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试切换倍速"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_pause"
+            app:layout_constraintEnd_toStartOf="@+id/btn_subtitle_switch"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_pause"
+            app:layout_constraintTop_toTopOf="@+id/btn_pause"/>
 
-    <Button
-        android:id="@+id/change_source"
-        android:layout_below="@+id/btn_pause"
-        android:text="切换资源"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btn_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_speed_switch"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:text="播放"
+            app:layout_constraintEnd_toStartOf="@+id/btn_pause"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <Button
+            android:id="@+id/btn_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="暂停"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_play"
+            app:layout_constraintEnd_toStartOf="@+id/btn_speed_switch"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_play"
+            app:layout_constraintTop_toTopOf="@+id/btn_play"/>
+
+        <EditText
+            android:id="@+id/et_url"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:focusable="true"
+            android:singleLine="true"
+            android:hint="请输入播放连接"
+            app:layout_constraintEnd_toStartOf="@+id/bt_clear"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_play"/>
+
+        <Button
+            android:id="@+id/bt_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="1dp"
+            android:focusable="true"
+            android:text="清除"
+            app:layout_constraintBottom_toBottomOf="@+id/et_url"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/et_url"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
-            android:layout_below="@+id/change_source"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/layout_cl"
+        android:layout_marginTop="10dp">
+
         <SurfaceView
-            android:layout_centerInParent="true"
             android:id="@+id/surface_view"
             android:layout_width="480dp"
-            android:layout_height="270dp" />
+            android:layout_height="270dp"
+            android:layout_centerInParent="true"/>
 
         <ProgressBar
             android:id="@+id/pb"
-            android:visibility="invisible"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"/>
     </RelativeLayout>
 
 

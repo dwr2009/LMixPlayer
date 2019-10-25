@@ -2,17 +2,19 @@ package com.zoe.lplaydemo;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zoe.lplaydemo.util.LogUtil;
 import com.zoe.lplaydemo.view.MySeekBar;
@@ -51,17 +53,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //    private static final String VIDEO_URL = "http://ts.lemmovie.com/a678c957-ef44-4c5d-a2d9-99003bab05d5/master.m3u8";//J2时移
 //    private static final String VIDEO_URL = "http://ts.lemmovie.com/3dc11d9d-c9bd-409d-8bd7-3acec1f2ffb6/master.m3u8";//时移 马来西亚 NTV7
 //    private static final String VIDEO_URL = "http://10.20.63.222:1977/hls/3_VN_FOX_MOVIES_HD.m3u8";//exo显示第一帧卡住
-//    private static final String VIDEO_URL = "http://10.20.63.222:1977/hls/6_World_Match_RU.m3u8";
-//    private static final String VIDEO_URL = "http://10.20.63.222:1977/hls/6_World_Eurosport_2_HD_RU.m3u8";
-    private static final String VIDEO_URL = "http://vod.lemmovie.com/vod/f848473a-5b51-e4df-4bd9-a603d6c70c4d.m3u8";//点播
-    private MySeekBar seekBar;
-    private TextView            tvPassTime;
-    private TextView            tvBufferTime;
-    private boolean             isDragging;
-    private TextView tvDuration;
-    private String[] mPaths;
-    private int pathIndex=0;
-    private ProgressBar mPb;
+//    private static final String VIDEO_URL = "http://vod.lemmovie.com/vod/f848473a-5b51-e4df-4bd9-a603d6c70c4d.m3u8";//点播
+//    private static final String VIDEO_URL = "http://10.20.63.222:1977/hls/3_RUS_10786037429523372682964210653676_902362516272887795652711639785.m3u8?snaca_hls_m3u8";
+    private static final String      VIDEO_URL = "http://107.155.37.50:1977/hls/3_KR_KBS_1TV.m3u8";
+    private long bufferTime = System.currentTimeMillis();
+    private              MySeekBar   seekBar;
+    private              TextView    tvPassTime;
+    private              TextView    tvBufferTime;
+    private              boolean     isDragging;
+    private              TextView    tvDuration;
+    private              ProgressBar mPb;
+    private              EditText    mEt_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,21 +76,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvPassTime = findViewById(R.id.tv_pass_time);
         tvBufferTime = findViewById(R.id.tv_buffer_time);
         tvDuration = findViewById(R.id.tv_duration);
+        mEt_url = findViewById(R.id.et_url);
 
-        Button btnSwitch = findViewById(R.id.btn_screen_switch);
-        btnSwitch.setOnClickListener(this);
-
-        Button btnSubtitle = findViewById(R.id.btn_subtitle_switch);
-        btnSubtitle.setOnClickListener(this);
-
-        Button btnSpeed = findViewById(R.id.btn_speed_switch);
-        btnSpeed.setOnClickListener(this);
-
-        Button btnPlay = findViewById(R.id.btn_pause);
-        btnPlay.setOnClickListener(this);
-
-        Button btnChange = findViewById(R.id.change_source);
-        btnChange.setOnClickListener(this);
+        findViewById(R.id.btn_screen_switch).setOnClickListener(this);
+        findViewById(R.id.btn_subtitle_switch).setOnClickListener(this);
+        findViewById(R.id.btn_speed_switch).setOnClickListener(this);
+        findViewById(R.id.btn_play).setOnClickListener(this);
+        findViewById(R.id.btn_pause).setOnClickListener(this);
+        findViewById(R.id.bt_clear).setOnClickListener(this);
 
         mPb = findViewById(R.id.pb);
         seekBar = findViewById(R.id.sb_progress);
@@ -140,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initPlayer();
     }
 
-    private long bufferTime = System.currentTimeMillis();
 
     private void initPlayer() {
         PlayManager instance = PlayManager.getInstance();
@@ -186,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 seekBar.setSecondaryProgress(secondaryProgress);
                 tvPassTime.setText(String.format("当前进度：%s", formatPlayTime(currentPos)));
                 tvBufferTime.setText(String.format("缓冲进度：%s", formatPlayTime(bufferedPos)));
-//                LogUtil.i("duration:"+duration+",currentPos:"+currentPos+",bufferedPos:"+bufferedPos);
+                //                LogUtil.i("duration:"+duration+",currentPos:"+currentPos+",bufferedPos:"+bufferedPos);
             }
 
             @Override
@@ -197,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onPlayError(Exception e, int errorCode) {
                 LogUtil.e("onPlayError："+e.getMessage()+",errorCode:"+errorCode);
+
             }
 
             @Override
@@ -219,10 +214,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SourceConfigure configure = new SourceConfigure(VIDEO_URL,subtitleList);*/
         SourceConfigure configure = new SourceConfigure(VIDEO_URL);
 
-        String path = Environment.getExternalStorageDirectory() + File.separator + "1.ts";
-//        SourceConfigure configure = new SourceConfigure(path);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "2.ts";
+        //        SourceConfigure configure = new SourceConfigure(path);
 
-        iPlayer.play(configure);
+        //        iPlayer.play(configure);
     }
 
     @Override
@@ -249,15 +244,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_screen_switch:
                 switchScreen();
                 break;
-            case R.id.btn_pause:
-                if(iPlayer.isPlaying()) {
-                    iPlayer.pause();
-                } else {
-                    iPlayer.start();
+            case R.id.btn_play:
+                String url = mEt_url.getText().toString();
+                if (TextUtils.isEmpty(url)){
+                    showToast("请输入播放地址");
+                    return;
                 }
+                SourceConfigure configure = new SourceConfigure(url);
+                iPlayer.play(configure);
+                break;
+            case R.id.btn_pause:
+                mPb.setVisibility(View.INVISIBLE);
+                iPlayer.pause();
                 break;
             case R.id.btn_subtitle_switch:
-//                iPlayer.switchSubtitle(1);
+                //                iPlayer.switchSubtitle(1);
                 break;
             case R.id.btn_speed_switch:
                 speed += 0.5f;
@@ -267,10 +268,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 LogUtil.d("speed is :" + speed);
                 iPlayer.switchSpeed(speed);
                 break;
-            case R.id.change_source:
-                pathIndex++;
-                pathIndex%=mPaths.length;
-                iPlayer.play(new SourceConfigure(mPaths[pathIndex]));
+            case R.id.bt_clear:
+                mEt_url.setText("");
                 break;
         }
     }
@@ -345,5 +344,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             return mFormatter.format("%02d:%02d", minutes, seconds).toString();
         }
+    }
+
+    private void showToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }
